@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AutoFlow</string>
+    <string name="notification_channel_name">AutoFlow Service</string>
+    <string name="notification_channel_description">AutoFlow background service notifications</string>
+    <string name="execution_channel_name">AutoFlow Notifications</string>
+    <string name="execution_channel_description">Notifications triggered by automation routines</string>
+</resources>
