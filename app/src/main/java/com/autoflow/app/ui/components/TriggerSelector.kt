@@ -32,11 +32,21 @@ fun TriggerSelector(
 
     val triggerOptions = listOf(
         Trigger.TYPE_BATTERY_LEVEL to "Battery Level",
+        Trigger.TYPE_BATTERY_CHARGING to "Battery Charging",
+        Trigger.TYPE_BATTERY_DISCHARGING to "Battery Discharging",
         Trigger.TYPE_WIFI_CONNECTED to "WiFi Connected",
+        Trigger.TYPE_WIFI_DISCONNECTED to "WiFi Disconnected",
+        Trigger.TYPE_WIFI_NETWORK_CHANGED to "WiFi Network Changed",
         Trigger.TYPE_BLUETOOTH_CONNECTED to "Bluetooth Connected",
+        Trigger.TYPE_DEVICE_CONNECTED to "Device Connected",
+        Trigger.TYPE_DEVICE_DISCONNECTED to "Device Disconnected",
         Trigger.TYPE_TIME to "Time",
         Trigger.TYPE_LOCATION to "Location",
-        Trigger.TYPE_APP_OPENED to "App Opened"
+        Trigger.TYPE_APP_OPENED to "App Opened",
+        Trigger.TYPE_INCOMING_CALL to "Incoming Call",
+        Trigger.TYPE_MISSED_CALL to "Missed Call",
+        Trigger.TYPE_CALL_ENDED to "Call Ended",
+        Trigger.TYPE_NFC_TAG_SCANNED to "NFC Tag Scanned"
     )
 
     Column(modifier = Modifier.fillMaxWidth()) {

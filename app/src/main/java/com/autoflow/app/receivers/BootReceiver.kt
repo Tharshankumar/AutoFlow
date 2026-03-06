@@ -14,9 +14,12 @@ class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            Log.d(TAG, "Boot completed, starting AutoFlow service")
+            Log.d(TAG, "Boot completed, restarting AutoFlow automation engine")
+            // Restart the foreground service which will reinitialize the AutomationEngine
+            // and reload all routines
             val serviceIntent = Intent(context, AutoFlowService::class.java)
             context.startForegroundService(serviceIntent)
+            Log.d(TAG, "AutoFlow service restart requested")
         }
     }
 }

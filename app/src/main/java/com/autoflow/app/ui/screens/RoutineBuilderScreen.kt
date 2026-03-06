@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -69,11 +70,12 @@ fun RoutineBuilderScreen(
 ) {
     var currentStep by remember { mutableIntStateOf(0) }
     var routineName by remember { mutableStateOf("") }
+    var reverseActionsEnabled by remember { mutableStateOf(false) }
     val triggers = remember { mutableStateListOf<TriggerConfig>() }
     val conditions = remember { mutableStateListOf<ConditionConfig>() }
     val actions = remember { mutableStateListOf<ActionConfig>() }
 
-    val stepTitles = listOf("Trigger", "Conditions", "Actions", "Save")
+    val stepTitles = listOf("Trigger", "Conditions", "Actions", "Reverse Actions", "Save")
 
     Scaffold(
         topBar = {
@@ -103,7 +105,7 @@ fun RoutineBuilderScreen(
             // Progress indicator
             @Suppress("DEPRECATION")
             LinearProgressIndicator(
-                progress = (currentStep + 1) / 4f,
+                progress = (currentStep + 1) / 5f,
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -111,7 +113,7 @@ fun RoutineBuilderScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Step ${currentStep + 1} of 4",
+                text = "Step ${currentStep + 1} of 5",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -133,12 +135,17 @@ fun RoutineBuilderScreen(
                         0 -> TriggerStepContent(triggers)
                         1 -> ConditionStepContent(conditions)
                         2 -> ActionStepContent(actions)
-                        3 -> SaveStepContent(
+                        3 -> ReverseActionStepContent(
+                            reverseActionsEnabled = reverseActionsEnabled,
+                            onToggle = { reverseActionsEnabled = it }
+                        )
+                        4 -> SaveStepContent(
                             routineName = routineName,
                             onNameChange = { routineName = it },
                             triggers = triggers,
                             conditions = conditions,
-                            actions = actions
+                            actions = actions,
+                            reverseActionsEnabled = reverseActionsEnabled
                         )
                     }
                 }
@@ -159,13 +166,14 @@ fun RoutineBuilderScreen(
                     Spacer(modifier = Modifier)
                 }
 
-                if (currentStep < 3) {
+                if (currentStep < 4) {
                     Button(
                         onClick = { currentStep++ },
                         enabled = when (currentStep) {
                             0 -> triggers.isNotEmpty() && triggers.all { it.type.isNotEmpty() && it.value.isNotEmpty() }
                             1 -> true // Conditions are optional
                             2 -> actions.isNotEmpty() && actions.all { it.type.isNotEmpty() && it.value.isNotEmpty() }
+                            3 -> true // Reverse actions are optional
                             else -> true
                         }
                     ) {
@@ -175,7 +183,10 @@ fun RoutineBuilderScreen(
                     Button(
                         onClick = {
                             viewModel.saveRoutine(
-                                routine = Routine(name = routineName),
+                                routine = Routine(
+                                    name = routineName,
+                                    reverseActionsEnabled = reverseActionsEnabled
+                                ),
                                 triggers = triggers.map { Trigger(routineId = 0, type = it.type, value = it.value) },
                                 conditions = conditions.filter { it.type.isNotEmpty() && it.value.isNotEmpty() }
                                     .map { Condition(routineId = 0, type = it.type, value = it.value) },
@@ -313,12 +324,67 @@ fun ActionStepContent(actions: MutableList<ActionConfig>) {
 }
 
 @Composable
+fun ReverseActionStepContent(
+    reverseActionsEnabled: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    Column {
+        Text(
+            text = "Enable Reverse Actions",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "When the trigger reverses (e.g., headphones disconnected), automatically undo the actions",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Reverse Actions",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = if (reverseActionsEnabled) "Actions will be reversed when trigger deactivates"
+                    else "Actions will not be reversed",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = reverseActionsEnabled,
+                onCheckedChange = onToggle
+            )
+        }
+
+        if (reverseActionsEnabled) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Example: If your action sets volume to 80%, the reverse will restore the previous volume level.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
 fun SaveStepContent(
     routineName: String,
     onNameChange: (String) -> Unit,
     triggers: List<TriggerConfig>,
     conditions: List<ConditionConfig>,
-    actions: List<ActionConfig>
+    actions: List<ActionConfig>,
+    reverseActionsEnabled: Boolean = false
 ) {
     Column {
         Text(
@@ -345,6 +411,13 @@ fun SaveStepContent(
         SummarySection("Conditions", conditions.filter { it.type.isNotEmpty() }.map { "${it.type}: ${it.value}" })
         Spacer(modifier = Modifier.height(12.dp))
         SummarySection("Actions", actions.map { "${it.type}: ${it.value}" })
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "Reverse Actions: ${if (reverseActionsEnabled) "Enabled" else "Disabled"}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (reverseActionsEnabled) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

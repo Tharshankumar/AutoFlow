@@ -23,8 +23,11 @@ import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Nfc
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -248,10 +251,21 @@ fun TriggerChip(triggerType: String) {
 fun getTriggerIconAndLabel(triggerType: String): Pair<ImageVector, String> {
     return when (triggerType) {
         Trigger.TYPE_BATTERY_LEVEL -> Icons.Default.BatteryChargingFull to "Battery"
-        Trigger.TYPE_WIFI_CONNECTED -> Icons.Default.Wifi to "WiFi"
+        Trigger.TYPE_BATTERY_CHARGING -> Icons.Default.BatteryChargingFull to "Charging"
+        Trigger.TYPE_BATTERY_DISCHARGING -> Icons.Default.BatteryChargingFull to "Discharging"
+        Trigger.TYPE_WIFI_CONNECTED -> Icons.Default.Wifi to "WiFi On"
+        Trigger.TYPE_WIFI_DISCONNECTED -> Icons.Default.Wifi to "WiFi Off"
+        Trigger.TYPE_WIFI_NETWORK_CHANGED -> Icons.Default.Wifi to "WiFi Changed"
         Trigger.TYPE_BLUETOOTH_CONNECTED -> Icons.Default.Bluetooth to "Bluetooth"
+        Trigger.TYPE_DEVICE_CONNECTED -> Icons.Default.Bluetooth to "Device On"
+        Trigger.TYPE_DEVICE_DISCONNECTED -> Icons.Default.Bluetooth to "Device Off"
         Trigger.TYPE_TIME -> Icons.Default.Schedule to "Time"
         Trigger.TYPE_LOCATION -> Icons.Default.LocationOn to "Location"
+        Trigger.TYPE_APP_OPENED -> Icons.Default.Apps to "App"
+        Trigger.TYPE_INCOMING_CALL -> Icons.Default.Phone to "Call"
+        Trigger.TYPE_MISSED_CALL -> Icons.Default.Phone to "Missed Call"
+        Trigger.TYPE_CALL_ENDED -> Icons.Default.Phone to "Call Ended"
+        Trigger.TYPE_NFC_TAG_SCANNED -> Icons.Default.Nfc to "NFC"
         else -> Icons.Default.Schedule to triggerType
     }
 }
