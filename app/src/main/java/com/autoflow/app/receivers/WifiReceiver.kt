@@ -7,6 +7,8 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.util.Log
+import com.autoflow.app.core.Event
+import com.autoflow.app.core.EventBus
 import com.autoflow.app.data.database.entities.Trigger
 import com.autoflow.app.engine.RuleEngine
 
@@ -27,8 +29,27 @@ class WifiReceiver : BroadcastReceiver() {
                 .getSystemService(Context.WIFI_SERVICE) as? WifiManager
             val ssid = wifiManager?.connectionInfo?.ssid?.removeSurrounding("\"") ?: "unknown"
             Log.d(TAG, "WiFi connected: $ssid")
+
+            // Publish event through EventBus (new architecture)
+            EventBus.getInstance().publish(
+                Event(
+                    type = Event.TYPE_WIFI_CONNECTED,
+                    payload = mapOf(Event.KEY_WIFI_SSID to ssid)
+                )
+            )
+
+            // Legacy: still notify RuleEngine directly for backward compatibility
             RuleEngine.getInstance(context)
                 .onTrigger(Trigger.TYPE_WIFI_CONNECTED, ssid)
+        } else {
+            // WiFi disconnected
+            Log.d(TAG, "WiFi disconnected")
+            EventBus.getInstance().publish(
+                Event(
+                    type = Event.TYPE_WIFI_DISCONNECTED,
+                    payload = emptyMap()
+                )
+            )
         }
     }
 }

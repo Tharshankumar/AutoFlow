@@ -18,7 +18,7 @@ import com.autoflow.app.data.database.entities.Trigger
         Action::class,
         ExecutionLog::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

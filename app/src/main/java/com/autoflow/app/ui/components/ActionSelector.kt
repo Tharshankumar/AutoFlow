@@ -35,7 +35,25 @@ fun ActionSelector(
         Action.TYPE_TOGGLE_WIFI to "Toggle WiFi",
         Action.TYPE_TOGGLE_BLUETOOTH to "Toggle Bluetooth",
         Action.TYPE_OPEN_APP to "Open App",
-        Action.TYPE_SHOW_NOTIFICATION to "Show Notification"
+        Action.TYPE_SHOW_NOTIFICATION to "Show Notification",
+        Action.TYPE_ENABLE_WIFI to "Enable WiFi",
+        Action.TYPE_DISABLE_WIFI to "Disable WiFi",
+        Action.TYPE_ENABLE_BLUETOOTH to "Enable Bluetooth",
+        Action.TYPE_DISABLE_BLUETOOTH to "Disable Bluetooth",
+        Action.TYPE_ENABLE_BATTERY_SAVER to "Enable Battery Saver",
+        Action.TYPE_DISABLE_BATTERY_SAVER to "Disable Battery Saver",
+        Action.TYPE_PLAY_MUSIC to "Play Music",
+        Action.TYPE_PAUSE_MUSIC to "Pause Music",
+        Action.TYPE_NEXT_TRACK to "Next Track",
+        Action.TYPE_PREVIOUS_TRACK to "Previous Track",
+        Action.TYPE_SEND_SMS to "Send SMS",
+        Action.TYPE_OPEN_CAMERA to "Open Camera",
+        Action.TYPE_TAKE_PHOTO to "Take Photo",
+        Action.TYPE_RECORD_VIDEO to "Record Video",
+        Action.TYPE_ENABLE_AIRPLANE_MODE to "Enable Airplane Mode",
+        Action.TYPE_DISABLE_AIRPLANE_MODE to "Disable Airplane Mode",
+        Action.TYPE_WAIT_SECONDS to "Wait (Seconds)",
+        Action.TYPE_WAIT_MINUTES to "Wait (Minutes)"
     )
 
     Column(modifier = Modifier.fillMaxWidth()) {
