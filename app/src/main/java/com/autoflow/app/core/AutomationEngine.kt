@@ -9,6 +9,7 @@ import com.autoflow.app.engine.ConditionEvaluator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /**
@@ -36,7 +37,8 @@ class AutomationEngine private constructor(private val context: Context) {
         }
     }
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val supervisorJob = SupervisorJob()
+    private var scope = CoroutineScope(supervisorJob + Dispatchers.IO)
     private val eventBus = EventBus.getInstance()
     private val stateManager = StateManager.getInstance()
     private val reverseActionEngine = ReverseActionEngine.getInstance()
@@ -61,13 +63,16 @@ class AutomationEngine private constructor(private val context: Context) {
         Log.d(TAG, "Starting AutomationEngine")
         isRunning = true
 
+        // Create a fresh coroutine scope
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
         // Subscribe to all events from the EventBus
         eventBus.subscribeAll(EventBus.EventListener { event ->
             handleEvent(event)
         })
 
-        // Initialize all registered plugins
-        pluginRegistry.initializeAll(context)
+        // Note: Plugins are registered and initialized in AutoFlowApplication.onCreate()
+        // No duplicate initialization here.
 
         Log.d(TAG, "AutomationEngine started successfully")
     }
@@ -78,6 +83,10 @@ class AutomationEngine private constructor(private val context: Context) {
     fun stop() {
         Log.d(TAG, "Stopping AutomationEngine")
         isRunning = false
+
+        // Cancel all in-flight coroutines
+        scope.cancel()
+
         eventBus.clear()
         pluginRegistry.shutdownAll()
         Log.d(TAG, "AutomationEngine stopped")
